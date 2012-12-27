@@ -37,7 +37,6 @@
     <None Include="packages.config" />
     <Compile Include="TarjanAlgorithm.fs" />
     <Compile Include="TarjanTests.fs" />
-    <Content Include="License.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
