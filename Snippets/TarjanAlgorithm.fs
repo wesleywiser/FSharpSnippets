@@ -12,20 +12,18 @@ type Vertex<'a> = { Item: 'a; mutable Index: int option; mutable Lowlink : int o
 let tarjanAlgorithm (V : 'a seq) (getConnectedVerticies : ('a -> 'a seq)) : ('a seq seq) =
     let V = Map(seq { for v in V -> (v, { Item = v; Index = None; Lowlink = None }) })
 
-    let index = ref 0
     let s = ref [] //one way linked lists are the same as stacks
 
-    let rec strongconnect (v : 'a Vertex) =
-        v.Index <- Some !index
-        v.Lowlink <- Some !index
-        index := !index + 1
+    let rec strongconnect (v : 'a Vertex) index =
+        v.Index <- Some index
+        v.Lowlink <- Some index
         s := v.Item :: !s //push v.Item onto the stack (list)
 
         seq {
             for w in (getConnectedVerticies v.Item) |> Seq.map (fun w -> V.[w]) do
                 if w.Index.IsNone then 
                     //Successor w has not yet been visited; recurse on it
-                    yield! strongconnect w
+                    yield! strongconnect w (index + 1)
                     v.Lowlink <- Some (min v.Lowlink.Value w.Lowlink.Value)
                 else if List.exists ((=) w.Item) !s then
                     //Successor w is in stack S and hence in the current SCC
@@ -48,5 +46,5 @@ let tarjanAlgorithm (V : 'a seq) (getConnectedVerticies : ('a -> 'a seq)) : ('a 
     seq {
         for (_,v) in (V |> Map.toSeq) do
             if v.Index.IsNone then
-                yield! strongconnect v
+                yield! strongconnect v 0
     }
